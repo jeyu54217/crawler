@@ -46,8 +46,6 @@ for page in range(1,endPage):
     # sub_blocks = bs4_obj.find_all("div", {"class": "b-block__right b-pos-relative"})
     
     for block in main_blocks:
-        url_compData = f"https://www.104.com.tw/jobs/search/?ro=0&keyword={keyword_104}&expansionType=area%2Cspec%2Ccom%2Cjob%2Cwf%2Cwktm&area=6001001000&order=14&asc=0&page={page}&mode=s&jobsource=2018indexpoc&langFlag=0&langStatus=0&recommendJob=1&hotJob=1"
-        response_html = requests.get(url_104).text
         # raw data
         jobName_raw = block.find("a", {"class": "js-job-link"}) 
         company_raw = block.find_all("li")[1] # can't find by keyword, so find_all then choose.
@@ -64,7 +62,11 @@ for page in range(1,endPage):
         updateDate = updateDate_raw.getText().strip() 
         # discription = discription_raw.getText().replace("\n", " ")
         result= [jobName, company, salary, updateDate]
-        print(result)
+        
+        compData_url = f"https://twinc.com.tw/#/business/name/{company}/"
+        compData_response = requests.get(compData_url).text
+        compData_bs4Obj = BeautifulSoup(compData_response ,"lxml")
+        print(compData_bs4Obj)
              
         # if jobName.getText():
         #     print(result)
