@@ -1,11 +1,132 @@
 from bs4 import BeautifulSoup
-
-import requests
+from selenium import webdriver
+from pathlib import Path
 import time
-import re
 
-     
 start_time = time.time()  # timer
+chrome_path = f"{Path(__file__).resolve().parent}\chromedriver.exe"
+
+def get_end_page(search_keyword):
+    # Get html data by Selenium
+    url_104 = f"https://www.104.com.tw/company/?keyword={search_keyword}&jobsource=checkc&mode=s"
+    browser = webdriver.Chrome(chrome_path,)
+    browser.get(url_104)
+    _html_data = browser.page_source
+    browser.close()
+    # Get the end page number by bs4
+    bs4_obj = BeautifulSoup(_html_data, 'lxml')
+    all_page_list = bs4_obj.find_all("li", {"class":"multiselect__element position-relative"})  
+    page_list = []
+    for page in all_page_list:
+        page_list.append(page.find('span', {"class":"multiselect__option d-flex align-items-center"}))
+    end_page_num = len(page_list)-2
+    return end_page_num
+
+def get_html_data(search_keyword,end_page_num):
+    # Get html data by Selenium
+    url_104 = f"https://www.104.com.tw/company/?keyword={search_keyword}&jobsource=checkc&mode=s"
+    browser = webdriver.Chrome(chrome_path,)
+    browser.get(url_104)
+    # auto-scrolling to the end page with AJAX
+    starting_page = 1
+    for starting_page in range(starting_page, end_page_num):
+        browser.execute_script("window.scrollTo(100,document.body.scrollHeight)") 
+        time.sleep(1)
+    html_data = browser.page_source  # return a string
+    browser.close()
+    return html_data
+
+def get_company_name(html_data):
+    bs4_obj = BeautifulSoup(html_data, 'lxml')
+    company_name_blocks = bs4_obj.find_all("div", {"class":"info-job text-break mb-2"})  # return a list
+    company_names = []
+    for name in company_name_blocks:
+        name.find('a', {"data-gtm-list":"公司名稱"})
+        company_names.append(name.getText().strip())
+    return company_names
+
+def get_company_intro(html_data):
+    bs4_obj = BeautifulSoup(html_data, 'lxml')
+    company_intro_blocks = bs4_obj.find_all("div", {"class":"info-container"})  # return a list
+    company_intros = []
+    for intro in company_intro_blocks:
+        intro.find("div", {"class":"info-description text-gray-darker t4 text-break mb-2 position-relative info-description__line2"})
+        company_intros.append(intro.getText().replace('\n',""))
+    return company_intros
+
+def get_check_page_url(html_data):
+    bs4_obj = BeautifulSoup(html_data, 'lxml')
+    check_page_url_blocks = bs4_obj.find_all("div", {"class":"info-job text-break mb-2"})
+    check_page_urls  = []
+    for block in check_page_url_blocks:
+        for link in block:
+            if link.get('href') is None:
+                continue
+            check_page_urls.append(
+                f"https:{link.get('href').strip('').replace('?jobsource=checkc','')}"
+                )
+            # check_page_urls.append(link.get('href').strip("").strip("//"))
+    return check_page_urls  
+
+def get_company_id(html_data):
+    bs4_obj = BeautifulSoup(html_data, 'lxml')
+    company_id_blocks = bs4_obj.find_all("div", {"class":"info-job text-break mb-2"})
+    company_id  = []
+    for block in company_id_blocks:
+        for id in block:
+            if id.get('href') is None:
+                continue
+            company_id.append(
+                id.get('href').replace('//www.104.com.tw/company/','').replace('?jobsource=checkc','').strip('')
+                )
+            # check_page_urls.append(link.get('href').strip("").strip("//"))
+    return company_id
+      
+def get_company_product(check_page_urls):
+    company_products = []
+    for url in check_page_urls:
+        # Get html data by Selenium
+        browser = webdriver.Chrome(chrome_path,)
+        browser.get(url)
+        time.sleep(.5)
+        _html_data = browser.page_source
+        browser.close()
+        # Get products' info by bs4
+        bs4_obj = BeautifulSoup(_html_data, 'lxml')
+        company_product_blocks = bs4_obj.find_all("div", {"id":"serve"})
+        for product in company_product_blocks:
+            product.find("p", {"class":"r3 mb-0 text-break"})
+            # if product is None:
+            #     return ""
+            company_products.append(product.getText().replace('\r',"").replace('\n'," "))
+    return company_products
+
+# [issue] get_company_product doesn't match company name , try keyword : CTBC
+
+
+if __name__ == '__main__':
+    # company_info(0)
+    # Workflow_control= sys.argv[1]
+    # PATH_contorl    = sys.argv[2]
+    # CONFIG_PATH     = sys.argv[3] 
+    # Main(CONFIG_PATH,Workflow_control,PATH_contorl)
+
+    search_keyword = "CTBC"
+    end_page_num = get_end_page(search_keyword)
+    html_data = get_html_data(search_keyword,end_page_num)
+    # check_page_urls = get_check_page_url(html_data)
+    company_name = get_company_name(html_data)
+    # company_intro = get_company_intro(html_data)
+    # company_product = get_company_product(check_page_urls)
+    # company_id = get_company_id(html_data)
+    print(company_name,len(company_name))
+    # # print(check_page_urls,len(check_page_urls))
+    # # print(company_intro,len(company_intro))
+    # print(company_product,len(company_product))
+    # # print(company_id,len(company_id))
+
+print("Cost：" + str(time.time() - start_time) + " s")
+
 
 # url_104 = "https://www.104.com.tw/jobs/search/?ro=0&kwop=7&keyword=python%20django&expansionType=area%2Cspec%2Ccom%2Cjob%2Cwf%2Cwktm&area=6001001000&order=15&asc=0&page=1&jobexp=1%2C3&mode=s&jobsource=2018indexpoc&langFlag=0&langStatus=0&recommendJob=1&hotJob=1"
 # response_html = requests.get(url_104).text
