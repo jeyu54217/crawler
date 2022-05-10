@@ -36,17 +36,16 @@ def get_company_info(company_data_list):
     company_name_list = [company['name'] for company in company_data_list]
     company_profile_list = [company['profile'].replace('\r','').replace('\n','').replace('\u3000','').replace('\uf06c','') for company in company_data_list]
     return company_id_list, company_name_list, company_profile_list 
-x
+
 def get_company_product(company_id_list):
     company_product_list = []
     for company_id in company_id_list:
         company_product = requests.get(
             URL_AJAX + f"content/{company_id}",
             headers = HEADERS,
-            ).json()['data']['product'].replace('\n','').replace('\r','').replace('\u3000','').replace('\uf06c','').replace('\t','').replace('\xa','')
+            ).json()['data']['product'].replace('\n','').replace('\r','').replace('\u3000','').replace('\uf06c','').replace('\t','')
         company_product_list.append(company_product)
     return company_product_list
-
 
 if __name__ == '__main__':
     keyword = sys.argv[1]
@@ -59,7 +58,7 @@ if __name__ == '__main__':
     company_profile_list = get_company_info(company_data_list)[2]
     company_product_list = get_company_product(company_id_list)
 
-    result = zip(company_id_list,company_name_list,company_profile_list,company_product_list)
+    result = list(zip(company_id_list,company_name_list,company_profile_list,company_product_list))
 
     print(result,len(result))
 

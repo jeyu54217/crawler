@@ -2,6 +2,22 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 from pathlib import Path
 import time
+import requests
+HEADERS = { 
+   'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36',
+   'Host': 'www.businessweekly.com.tw',
+   'Referer': 'https://www.104.com.tw/',
+   'Origin': 'https://www.twincn.com'
+   }
+
+def test(keyword):
+    URL = f'https://www.twincn.com/Lq.aspx?q={keyword}'
+    a = requests.get(
+        URL,
+        headers = HEADERS,
+        ).text
+    return a
+
 
 start_time = time.time()  # timer
 chrome_path = f"{Path(__file__).resolve().parent}\chromedriver.exe"
@@ -111,19 +127,9 @@ if __name__ == '__main__':
     # CONFIG_PATH     = sys.argv[3] 
     # Main(CONFIG_PATH,Workflow_control,PATH_contorl)
 
-    search_keyword = "CTBC"
-    end_page_num = get_end_page(search_keyword)
-    html_data = get_html_data(search_keyword,end_page_num)
-    # check_page_urls = get_check_page_url(html_data)
-    company_name = get_company_name(html_data)
-    # company_intro = get_company_intro(html_data)
-    # company_product = get_company_product(check_page_urls)
-    # company_id = get_company_id(html_data)
-    print(company_name,len(company_name))
-    # # print(check_page_urls,len(check_page_urls))
-    # # print(company_intro,len(company_intro))
-    # print(company_product,len(company_product))
-    # # print(company_id,len(company_id))
+    keyword = "景宜股份有限公司"
+    print(test(keyword))
+   
 
 print("Cost：" + str(time.time() - start_time) + " s")
 
