@@ -1,8 +1,8 @@
 
-from bs4 import BeautifulSoup
 import time
 import sys
 import requests
+
 
 
 start_time = time.time()  # timer
@@ -23,38 +23,27 @@ def get_total_pages(keyword):
     
 def get_json_data(keyword, total_pages_num):
     company_data_list = []
-    for page in range(0, total_pages_num):
+    for page in range(1, total_pages_num):
         json_dict_data = requests.get(
             URL_AJAX + f"list?keyword={keyword}&page={page}",
             headers = HEADERS,
             ).json()['data']
-        company_data_list.append(json_dict_data)
-    print(company_data_list)
-    # return company_data_list[0]
+        company_data_list.extend(json_dict_data)
+    return company_data_list 
 
 def get_company_info(company_data_list):
-    company_id_list = []
-    for company in company_data_list:
-        if company == None:
-            continue
-        company_id_list.append(company['encodedCustNo'])
-
-
-
-    # company_id_list = [company['encodedCustNo'] for company in company_data_list if company == None:continue]
-    # company_name_list = [company['name'] for company in company_data_list]
-    # company_profile_list = [company['profile'] for company in company_data_list]
-
-    # return company_id_list, company_name_list, company_profile_list
-    return company_id_list 
-
+    company_id_list = [company['encodedCustNo'] for company in company_data_list]
+    company_name_list = [company['name'] for company in company_data_list]
+    company_profile_list = [company['profile'].replace('\r','').replace('\n','').replace('\u3000','').replace('\uf06c','') for company in company_data_list]
+    return company_id_list, company_name_list, company_profile_list 
+x
 def get_company_product(company_id_list):
     company_product_list = []
     for company_id in company_id_list:
         company_product = requests.get(
-            URL_AJAX + f"content/{company_id}?",
+            URL_AJAX + f"content/{company_id}",
             headers = HEADERS,
-            ).json()['data']['product']
+            ).json()['data']['product'].replace('\n','').replace('\r','').replace('\u3000','').replace('\uf06c','').replace('\t','').replace('\xa','')
         company_product_list.append(company_product)
     return company_product_list
 
@@ -65,14 +54,14 @@ if __name__ == '__main__':
     total_pages_num = get_total_pages(keyword)
     company_data_list = get_json_data(keyword, total_pages_num)
 
-    company_id_list = get_company_info(company_data_list)
-    # company_name_list = get_company_info(company_data_list)[1]
-    # company_profile_list = get_company_info(company_data_list)[2]
-    # company_product_list = get_company_product(company_id_list)
+    company_id_list = get_company_info(company_data_list)[0]
+    company_name_list = get_company_info(company_data_list)[1]
+    company_profile_list = get_company_info(company_data_list)[2]
+    company_product_list = get_company_product(company_id_list)
 
-    # result = list(zip(company_id_list,company_name_list,company_profile_list,company_product_list))
+    result = zip(company_id_list,company_name_list,company_profile_list,company_product_list)
 
-    print(total_pages_num)
+    print(result,len(result))
 
 
 print("Cost：" + str(time.time() - start_time) + " s")
