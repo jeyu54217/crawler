@@ -3,8 +3,6 @@ import time
 import sys
 import requests
 
-
-
 start_time = time.time()  # timer
 
 URL_AJAX = "https://www.104.com.tw/company/ajax/"
@@ -28,6 +26,8 @@ def get_json_data(keyword, total_pages_num):
             URL_AJAX + f"list?keyword={keyword}&page={page}",
             headers = HEADERS,
             ).json()['data']
+        if json_dict_data == None:
+            continue
         company_data_list.extend(json_dict_data)
     return company_data_list 
 
@@ -44,8 +44,11 @@ def get_company_product(company_id_list):
             URL_AJAX + f"content/{company_id}",
             headers = HEADERS,
             ).json()['data']['product'].replace('\n','').replace('\r','').replace('\u3000','').replace('\uf06c','').replace('\t','')
+            # .replace('\xa0','')
         company_product_list.append(company_product)
     return company_product_list
+
+
 
 if __name__ == '__main__':
     keyword = sys.argv[1]
@@ -58,9 +61,9 @@ if __name__ == '__main__':
     company_profile_list = get_company_info(company_data_list)[2]
     company_product_list = get_company_product(company_id_list)
 
-    result = list(zip(company_id_list,company_name_list,company_profile_list,company_product_list))
+    result = list(zip(company_id_list, company_name_list, company_profile_list, company_product_list))
 
-    print(result,len(result))
+    print(result)
 
 
 print("Cost：" + str(time.time() - start_time) + " s")
