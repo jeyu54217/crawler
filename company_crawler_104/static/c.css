@@ -1,0 +1,73 @@
+
+.add {
+  height: 52px;
+  width: 52px;
+  background: rgb(243, 165, 0);
+  cursor: pointer;
+  color: #FFF;
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
+  transition-property: background;
+  transition-duration: 1s;
+  transition-timing-function: linear;
+}
+
+#addColumn {
+  display: inline-block;
+  vertical-align: top;
+  margin: 2px 0 0 0;
+}
+
+.add:hover {
+  background: rgb(246, 192, 82);
+}
+
+#addColumnChild {
+  line-height: 50px;
+}
+
+#addRow {
+  vertical-align: bottom;
+  margin: 0 0 0 2px;
+}
+
+#addRowChild {
+  line-height: 50px;
+}
+
+
+.del {
+    height: 52px;
+    width: 52px;
+    background: rgb(243, 165, 0);
+    cursor: pointer;
+    color: #FFF;
+    text-align: center;
+    font-family: 'Open Sans', sans-serif;
+    transition-property: background;
+    transition-duration: 1s;
+    transition-timing-function: linear;
+  }
+  
+  #delColumn {
+    display: inline-block;
+    vertical-align: top;
+    margin: 2px 0 0 0;
+  }
+  
+  .del:hover {
+    background: rgb(246, 192, 82);
+  }
+  
+  #delColumnChild {
+    line-height: 50px;
+  }
+  
+  #delRow {
+    vertical-align: bottom;
+    margin: 0 0 0 2px;
+  }
+  
+  #delRowChild {
+    line-height: 50px;
+  }
