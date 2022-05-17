@@ -3,7 +3,7 @@ import time
 import sys
 import requests
 
-start_time = time.time()  # timer
+# start_time = time.time()  # timer
 
 URL_AJAX = "https://www.104.com.tw/company/ajax/"
 HEADERS = { 
@@ -50,20 +50,20 @@ def get_company_product(company_id_list):
 
 
 
-if __name__ == '__main__':
-    keyword = sys.argv[1]
+# if __name__ == '__main__':
+#     keyword = sys.argv[1]
+#
+#     total_pages_num = get_total_pages(keyword)
+#     company_data_list = get_json_data(keyword, total_pages_num)
+#
+#     company_id_list = get_company_info(company_data_list)[0]
+#     company_name_list = get_company_info(company_data_list)[1]
+#     company_profile_list = get_company_info(company_data_list)[2]
+#     company_product_list = get_company_product(company_id_list)
+#
+#     result = list(zip(company_id_list, company_name_list, company_profile_list, company_product_list))
+#
+#     print(result)
 
-    total_pages_num = get_total_pages(keyword)
-    company_data_list = get_json_data(keyword, total_pages_num)
 
-    company_id_list = get_company_info(company_data_list)[0]
-    company_name_list = get_company_info(company_data_list)[1]
-    company_profile_list = get_company_info(company_data_list)[2]
-    company_product_list = get_company_product(company_id_list)
-
-    result = list(zip(company_id_list, company_name_list, company_profile_list, company_product_list))
-
-    print(result)
-
-
-print("Cost：" + str(time.time() - start_time) + " s") 
+# print("Cost：" + str(time.time() - start_time) + " s")
